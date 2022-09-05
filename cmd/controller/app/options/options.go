@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -150,7 +151,7 @@ const (
 )
 
 var (
-	defaultACMEHTTP01SolverImage                 = fmt.Sprintf("quay.io/jetstack/cert-manager-acmesolver:%s", util.AppVersion)
+	defaultACMEHTTP01SolverImage                 = lookupEnvOrDefault("ACMEHTTP01SolverImage", fmt.Sprintf("quay.io/jetstack/cert-manager-acmesolver:%s", util.AppVersion))
 	defaultACMEHTTP01SolverResourceRequestCPU    = "10m"
 	defaultACMEHTTP01SolverResourceRequestMemory = "64Mi"
 	defaultACMEHTTP01SolverResourceLimitsCPU     = "100m"
@@ -440,4 +441,14 @@ func (o *ControllerOptions) EnabledControllers() sets.String {
 	}
 
 	return enabled
+}
+
+func (varname string, defaultValue string) lookupEnvOrDefault() string {
+	value, ok := os.LookupEnv(varname)
+	if ok {
+		value = value
+	} else {
+		value = defaultValue
+	}
+	return value
 }
